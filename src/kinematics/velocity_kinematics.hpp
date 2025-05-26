@@ -1,0 +1,8 @@
+//
+// Created by mbero on 26/05/2025.
+//
+
+#ifndef VELOCITY_KINEMATICS_HPP
+#define VELOCITY_KINEMATICS_HPP
+
+#endif //VELOCITY_KINEMATICS_HPP

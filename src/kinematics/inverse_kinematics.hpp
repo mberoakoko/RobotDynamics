@@ -1,0 +1,8 @@
+//
+// Created by mbero on 26/05/2025.
+//
+
+#ifndef INVERSE_KINEMATICS_HPP
+#define INVERSE_KINEMATICS_HPP
+
+#endif //INVERSE_KINEMATICS_HPP
