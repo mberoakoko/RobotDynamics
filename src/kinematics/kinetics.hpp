@@ -11,7 +11,18 @@
 
 namespace Kinetics {
     using Screw = Eigen::Vector<float, 6>;
-    using Twist = Eigen::Vector<float, 6>;
+    struct Twist {
+        Screw screw;
+        float theta;
+    };
+    struct ScrewParams {
+        float q; // Displacement
+        Eigen::Vector3f omega_hat;
+        float h; // Pitch
+    };
+
+
+
 
     struct ExponentialCoordinate {
         Eigen::Vector3f omega_3_hat;
@@ -25,6 +36,22 @@ namespace Kinetics {
             };
         }
     };
+
+    inline auto to_screw(const ScrewParams& screw_params) -> Screw {
+        Screw result = Screw::Zero(6);
+        result.block(0, 0, 3, 1) = screw_params.omega_hat;
+        return result;
+    }
+
+    inline auto to_screw(float q, const Eigen::Vector3f& omega_hat, float pitch) -> Screw {
+        return to_screw({
+            .q = q,
+            .omega_hat = omega_hat,
+            .h = pitch
+        });
+    }
+
+
 
     inline auto rotation_inverse(const Eigen::Matrix3f& rotation_matrix) -> Eigen::Matrix3f {
         Eigen::Matrix3f inverse = rotation_matrix.transpose();
@@ -62,6 +89,19 @@ namespace Kinetics {
         return Kinetics::matrix_exponent_3(
             Kinetics::vec_3_to_so3(omega * theta)
         );
+    }
+
+    inline auto matrix_log_3(const Eigen::MatrixX3f& rotation_matrix) -> Twist {
+        return {};
+    }
+
+    inline auto r_p_to_trans(const Eigen::Matrix3f& r, const Eigen::Vector3f& p) -> Eigen::Matrix4f {
+        Eigen::Matrix4f result = Eigen::Matrix4f::Zero();
+        Eigen::Matrix3f rotation_matrix = r;
+        result.block(0, 0, 3, 3) = rotation_matrix;
+        result.block(0, 3, 3, 1) = p;
+        result(3, 3) = 1;
+        return result;
     }
 
 }
