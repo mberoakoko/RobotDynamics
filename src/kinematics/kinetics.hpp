@@ -9,7 +9,6 @@
 #include <bits/stdc++.h>
 #include <eigen3/Eigen/Core>
 #include<eigen3/Eigen/Geometry>
-#include <oneapi/tbb/task_arena.h>
 
 namespace Kinetics {
     using Screw = Eigen::Vector<float, 6>;
@@ -204,9 +203,23 @@ namespace Kinetics {
         return AxisAngle6::from_vector(exponential_coordinates);
     }
 
-    inline auto matrix_exponent_6(const Vector6& se3_matrix) -> Eigen::Matrix4f {
+    inline auto matrix_exponent_6(const Vector6& exponential_coodinates) -> Eigen::Matrix4f {
         Eigen::Matrix4f result = Eigen::Matrix4f::Zero();
-        Eigen::Matrix3f rotation_matrix = se3_matrix.block(0, 0, 3, 3);
+        const auto [screw , theta ] = to_axis_angle_6(exponential_coodinates);
+        Eigen::Matrix3f omega_skew = Kinetics::vec_3_to_so3(screw.head(3));
+        Eigen::Vector3f velocity = screw.tail(3);
+        result.block(0, 0, 3, 3) = Kinetics::matrix_exponent_3(omega_skew);
+        auto expr1 = Eigen::Matrix3f::Identity() * theta;
+        auto expr2 = (1 - ::cos(theta)) * omega_skew;
+        auto expr3 = (theta - ::sin(theta)) * (omega_skew * omega_skew) ;
+        Eigen::Vector3f displacement = (expr1 + expr2 + expr3) * velocity;
+        result.block(0, 3, 3, 1) = displacement;
+        result.block(3, 3, 1, 1) = Eigen::Matrix<float, 1, 1, 1>{{1}};
+        return result;
+    }
+
+    inline auto matrix_exponent_6(const Vector6& screw , double theta) -> Eigen::Matrix4f {
+        return matrix_exponent_6(screw * theta);
     }
 }
 #endif //KINETICS_HPP
