@@ -1,5 +1,10 @@
 #include <iostream>
+#include <limits>
+
 #include "src/kinematics/kinetics.hpp"
+#include<eigen3/Eigen/Geometry>
+
+#include "src/kinematics/foward_kinematics.hpp"
 
 class from_string {
     const char* str_;
@@ -14,15 +19,19 @@ public:
     }
 };
 
-int main() {
-    auto [omega_3_hat, theta] { Kinetics::axis_angle_3({1, 2, 3}) };
-    std::cout<<"Theta " <<theta<<"\n";
-    std::cout<<"Axis\n" <<omega_3_hat << "\n";
-    std::cout << Kinetics::vec_3_to_so3(omega_3_hat) << std::endl;
-    auto temp = Kinetics::vec_3_to_so3(omega_3_hat);
-    std::cout << temp * temp << std::endl;
-    auto rotated_matrix = Kinetics::rot_axis(omega_3_hat, theta);
-    std::cout<<"RotatedMatrix\n" <<rotated_matrix << "\n";
 
+auto run_experiments() -> void {
+    Eigen::Matrix4f home = Eigen::Matrix4f::Identity();
+    std::vector<Kinetics::Vector6> b_list{
+        Kinetics::Vector6{1, 2, 3, 1,2 , 3},
+        Kinetics::Vector6{1, 2, 3, 1, 2, 3},
+        Kinetics::Vector6{1, 2, 31, 1, 2, 3}};
+    std::vector<float> theta_list {M_PI, 0, 0};
+    std::cout << ForwardKinematics::forward_kinematics_in_body(home, b_list, theta_list);
+}
+
+
+int main() {
+    run_experiments();
     return 0;
 }
