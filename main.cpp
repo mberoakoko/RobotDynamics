@@ -5,7 +5,7 @@
 #include<eigen3/Eigen/Geometry>
 
 #include "src/kinematics/foward_kinematics.hpp"
-
+#include "src/kinematics/velocity_kinematics.hpp"
 class from_string {
     const char* str_;
 public:
@@ -26,12 +26,26 @@ auto run_experiments() -> void {
         Kinetics::Vector6{1, 2, 3, 1,2 , 3},
         Kinetics::Vector6{1, 2, 3, 1, 2, 3},
         Kinetics::Vector6{1, 2, 31, 1, 2, 3}};
-    std::vector<float> theta_list {M_PI, 0, 0};
+    std::vector<float> theta_list {M_PI, 0.1, 0.2};
     std::cout << ForwardKinematics::forward_kinematics_in_body(home, b_list, theta_list);
 }
 
 
+auto run_jacobioan_experiment() -> void {
+    std::vector<Kinetics::Vector6> b_list{
+        Kinetics::Vector6{1, 2, 3, 1,2 , 3},
+        Kinetics::Vector6{34, 22, 3, 1, 3, 4},
+        Kinetics::Vector6{2, 0.2, 3, 1, 4, 5},
+        Kinetics::Vector6{1, 1, 31, 1, 5, 6}};
+    std::vector<float> theta_list {M_PI, 1, 3};
+    auto jacobian = VelocityKinematics::jacobian_in_body(b_list, theta_list);
+    std::cout << jacobian << std::endl;
+
+};
+
+
 int main() {
-    run_experiments();
+    // run_experiments();
+    run_jacobioan_experiment();
     return 0;
 }
