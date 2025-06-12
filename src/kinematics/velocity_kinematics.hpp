@@ -31,6 +31,7 @@ namespace VelocityKinematics {
             return acc;
         };
 
+        [[nodiscard]]
         auto jacobian_entries()const -> std::vector<Kinetics::Vector6> {
             return jacobian_cache_;
         }
@@ -39,9 +40,45 @@ namespace VelocityKinematics {
         std::vector<Kinetics::Vector6> jacobian_cache_;
     };
 
+    namespace Utils {
+
+        inline auto get_homogenous_matrix_list(const std::vector<Kinetics::Vector6>& screw_list, std::vector<float> theta_list) -> std::vector<Eigen::Matrix4f> {
+            auto to_twist = [&theta_list, &screw_list](const std::size_t index) {
+                return screw_list.at(index) * theta_list.at(index);
+            };
+            const auto to_homogenous_mat = [](const Kinetics::Vector6& screw_vec) {
+                return Kinetics::matrix_exponent_6(-screw_vec);
+            };
+            const auto homogenous_mat_series = std::views::iota(0, VelocityKinematics::Bound(screw_list.size() - 1))
+                    | std::views::transform(to_twist)
+                    | std::views::transform(to_homogenous_mat);
+            std::vector<Eigen::Matrix4f> result;
+            std::ranges::copy(homogenous_mat_series, std::back_inserter(result));
+            return result;
+        }
+
+        inline auto generate_zipped_pair(
+                        const std::vector<Eigen::Matrix4f>& matrices,
+                        const std::vector<Kinetics::Vector6>& screw_list) -> std::vector<TransformationAccumulator::zipped_pair> {
+            const auto to_zipped_pair = [](const Eigen::MatrixX4f& homogenous_mat , const Kinetics::Vector6& vector) -> TransformationAccumulator::zipped_pair {
+                return {
+                    .mat = homogenous_mat,
+                    .vec = vector
+                };
+            };
+            auto zipped_pairs_range = std::views::iota(0, Bound(screw_list.size() - 1))
+            | std::views::transform([&matrices, &screw_list, &to_zipped_pair](const std::size_t index) {
+                return to_zipped_pair(matrices.at(index), screw_list.at(index));
+            });
+            std::vector<TransformationAccumulator::zipped_pair> result;
+            std::ranges::copy(zipped_pairs_range, std::back_inserter(result));
+            return  result;
+        }
+    }
+
     inline auto jacobian_in_body(const std::vector<Kinetics::Vector6>& b_list, std::vector<float> theta_list) -> Eigen::MatrixXf {
         assert(b_list.size() - 1 == theta_list.size());
-        const auto to_screw = [&theta_list, &b_list](const std::size_t index) {
+        const auto to_twist = [&theta_list, &b_list](const std::size_t index) {
             std::cout << " Index " << index << std::endl;
             return theta_list.at(index) * b_list.at(index);
         };
@@ -56,7 +93,7 @@ namespace VelocityKinematics {
             };
         };
         const auto homogenous_mat_series = std::views::iota(0, Bound(b_list.size() - 1))
-                | std::views::transform(to_screw)
+                | std::views::transform(to_twist)
                 | std::views::transform(to_homogenous_mat);
 
 
@@ -78,8 +115,18 @@ namespace VelocityKinematics {
         return jacobian;
 
     }
-    inline auto jacobian_in_space(const Eigen::Matrix4f& M, const std::vector<Kinetics::Vector6>& b_list, std::vector<float> theta_list) -> Eigen::MatrixXd {
-        Eigen::VectorXd jacobian;
+    inline auto jacobian_in_space(const std::vector<Kinetics::Vector6>& s_list,const std::vector<float>& theta_list) -> Eigen::MatrixXd {
+        assert(s_list.size() - 1 == theta_list.size());
+        auto matrices { VelocityKinematics::Utils::get_homogenous_matrix_list(s_list, theta_list) };
+        auto zipped_pairs{Utils::generate_zipped_pair(matrices, s_list)};
+        auto trans_acc = std::accumulate(
+            std::begin(zipped_pairs), std::end(zipped_pairs),
+            TransformationAccumulator{s_list.at(0)}
+            );
+        Eigen::MatrixXf jacobian(6, trans_acc.jacobian_entries().size());
+        for (int index = 1; index < trans_acc.jacobian_entries().size(); ++index) {
+            jacobian.col(index) = trans_acc.jacobian_entries().at(index);
+        }
         return jacobian;
     }
 }
