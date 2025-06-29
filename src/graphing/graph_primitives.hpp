@@ -23,6 +23,11 @@ namespace graph {
         [[nodiscard]]
         auto get_num_edges(const std::size_t& edges) -> std::size_t { return vertices_.at(edges).size();};
         auto add_vertex() -> void {vertices_.push_back(std::vector<Edge>{});};
+        auto get_vertices(const std::size_t v) -> const std::vector<Edge>&{return vertices_.at(v);};
+
+        auto n_edges_at(const std::size_t n) -> Edge const & {
+            return get_vertices(n).size();
+        }
 
         //----------------------------------------------------------------------------------------------------------------------
         // appending functions
@@ -38,7 +43,45 @@ namespace graph {
             add_edge(to, from, edge_data);
         }
 
+        //----------------------------------------------------------------------------------------------------------------------
+        // appending functions
+        //----------------------------------------------------------------------------------------------------------------------
+        class AdjacencyIterator {
+            std::vector<Edge> edges_;
+            std::size_t j_;
+        public:
+            explicit AdjacencyIterator(graph::Graph<T>& graph, std::size_t v, std::size_t j)
+                :edges_(graph.get_vertices(v)), j_(j){}
+
+            auto operator++() -> AdjacencyIterator& {
+                assrt(j_ < vertices_.size());
+                ++j_;
+                return *this;
+            }
+
+            auto operator !=(AdjacencyIterator rhs) -> bool {
+                return j != rhs.j_;
+            }
+
+            auto to() -> std::size_t {
+                return edges_.at(j_).to;
+            }
+
+            auto data() -> T const& {
+                return edges_.at(j_).edge_data;
+            }
+
+            auto get_edge() -> Edge const& {
+                return edges_.at(j_);
+            }
+        };
+
+        auto begin() const -> AdjacencyIterator  { return AdjacencyIterator(*this, 0, 0); }
+        auto end() const -> AdjacencyIterator { return AdjacencyIterator(*this, 0, vertices_.size()); };
+
     };
+
+
 }
 
 #endif //GRAPH_PRIMITIVES_HPP
