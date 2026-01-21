@@ -27,7 +27,7 @@ namespace InverseKinematics {
      * @return robot joint postions
      */
     template<std::size_t N>
-    inline auto inverse_kinematics_cartesian(
+    auto inverse_kinematics_cartesian(
         const CartesianFowardKinematicsFunction&& f,
         const JacobianFunction&& j,
         const Eigen::Vector3f& x_d,
