@@ -32,7 +32,7 @@ auto run_experiments() -> void {
 
 
 auto run_jacobioan_experiment() -> void {
-    std::vector<Kinetics::Vector6> b_list{
+    std::vector b_list{
         Kinetics::Vector6{1, 2, 3, 1,2 , 3},
         Kinetics::Vector6{34, 22, 3, 1, 3, 4},
         Kinetics::Vector6{2, 0.2, 3, 1, 4, 5},
