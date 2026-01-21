@@ -42,7 +42,7 @@ namespace InverseKinematics {
     }
 
     template<std::size_t N>
-    inline auto inverse_kinematics_screw(
+    auto inverse_kinematics_screw(
         const TwistFowardKinematicsFunction&& f,
         const JacobianFunction&& j,
         const Eigen::VectorXd& x_d,
