@@ -22,7 +22,7 @@ public:
 
 auto run_experiments() -> void {
     Eigen::Matrix4f home = Eigen::Matrix4f::Identity();
-    std::vector<Kinetics::Vector6> b_list{
+    std::vector b_list{
         Kinetics::Vector6{1, 2, 3, 1,2 , 3},
         Kinetics::Vector6{1, 2, 3, 1, 2, 3},
         Kinetics::Vector6{1, 2, 31, 1, 2, 3}};
