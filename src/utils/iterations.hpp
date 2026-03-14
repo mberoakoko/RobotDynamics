@@ -85,6 +85,17 @@ namespace utils::iterations {
 
     }
 
+    template<std::ranges::input_range R, typename F>
+    requires std::invocable<F, std::ranges::range_value_t<R>, std::ranges::range_value_t<R>>
+    auto converged(R&& values , F done) -> std::ranges::range_value_t<R> {
+        auto result = last(converge(std::forward<R>(values), std::move(done)));
+        if (!result) {
+            throw std::runtime_error("converged: The sequence is empty! ");
+        }
+        return *result;
+    }
+
+
 
 
     namespace test_functionality {
