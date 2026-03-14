@@ -26,6 +26,31 @@ namespace utils::iterations {
             co_yield state;
             state = stepping_function(state);
         }
+    };
+
+
+    /**
+    * @brief Return the last value of the given range.
+    * * Returns std::nullopt if the range is empty.
+    * If the range is infinite, this function will loop forever.
+    * * @tparam R A range type.
+    * @param values The range to iterate through.
+    * @return std::optional of the value type of the range.
+    */
+    template<std::ranges::input_range R>
+    auto last(R&& values) -> std::optional<std::ranges::range_value_t<R>> {
+        auto iter = std::ranges::begin(values);
+        auto sentinel = std::ranges::end(values);
+
+        if (iter == sentinel) {
+            return std::nullopt;
+        }
+
+        auto last_elem = *iter;
+        while (++iter != sentinel) {
+            last_elem = *iter;
+        }
+        return last_elem;
     }
 
 
