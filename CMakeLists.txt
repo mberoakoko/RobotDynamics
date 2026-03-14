@@ -8,4 +8,6 @@ add_executable(RobotDynamics main.cpp
         src/kinematics/kinetics.hpp
         src/kinematics/foward_kinematics.hpp
         src/kinematics/velocity_kinematics.hpp
-        src/kinematics/inverse_kinematics.hpp)
+        src/kinematics/inverse_kinematics.hpp
+        src/graphing/graph_primitives.hpp
+        src/utils/iterations.hpp)
