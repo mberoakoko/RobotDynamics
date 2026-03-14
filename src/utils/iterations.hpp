@@ -54,6 +54,38 @@ namespace utils::iterations {
     }
 
 
+    /**
+     * @brief Read from a range until two consecutive values satisfy the
+     * given done function or the input range ends.
+     * * Throws std::runtime_error if the input range is empty.
+     * * @tparam R An input range.
+     * @tparam F A callable taking two elements and returning bool.
+     */
+    template<std::ranges::input_range R, typename F>
+    requires std::invocable<F, std::ranges::range_value_t<R>, std::ranges::range_value_t<R>>
+    auto converge(R&& values, F done) -> std::generator<std::ranges::range_value_t<R>> {
+        auto iter = std::ranges::begin(values);
+        auto sentinel = std::ranges::end(values);
+
+        if (iter == sentinel) {
+            throw std::runtime_error("converge: Input iterator is already empty. ");
+        }
+
+        using T = std::ranges::range_value_t<R>;
+        T a = *iter;
+        co_yield a;
+        while (++ iter == sentinel) {
+            T b = *iter;
+            co_yield b;
+            if (done(a, b)) {
+                co_return;
+            }
+            a = std::move(b);
+        }
+
+    }
+
+
 
     namespace test_functionality {
 
