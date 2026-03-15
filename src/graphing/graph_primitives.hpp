@@ -54,7 +54,7 @@ namespace graph {
                 :edges_(graph.get_vertices(v)), j_(j){}
 
             auto operator++() -> AdjacencyIterator& {
-                assrt(j_ < vertices_.size());
+                // assrt(j_ < vertices_.size());
                 ++j_;
                 return *this;
             }

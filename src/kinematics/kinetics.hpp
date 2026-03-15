@@ -18,7 +18,10 @@ namespace Kinetics {
         Screw screw;
         float theta;
 
+
+        [[nodiscard]]
         auto to_vector() const -> Vector6 { return theta * screw; };
+
 
         static auto from_vector(const Vector6& vector) -> AxisAngle6 {
             return {
@@ -43,7 +46,7 @@ namespace Kinetics {
         const Eigen::Vector3f& q; // Displacement
         const Eigen::Vector3f& omega_hat;
         const float& h { 0 }; // Pitch
-    };;
+    };
 
 
 
@@ -68,6 +71,8 @@ namespace Kinetics {
         }
     };
 
+
+
     inline auto to_screw(const ScrewParams& screw_params) -> Screw {
         Screw result = Screw::Zero(6);
         result.block(0, 0, 3, 1) = screw_params.omega_hat;
@@ -75,6 +80,8 @@ namespace Kinetics {
         result.block(3, 0, 3, 1 ) = velocity;
         return result;
     }
+
+
 
     inline auto to_screw(const Eigen::Vector3f& q, const Eigen::Vector3f& omega_hat, float pitch) -> Screw {
         return to_screw({
@@ -89,7 +96,8 @@ namespace Kinetics {
     inline auto rotation_inverse(const Eigen::Matrix3f& rotation_matrix) -> Eigen::Matrix3f {
         Eigen::Matrix3f inverse = rotation_matrix.transpose();
         return inverse;
-    };
+    }
+
 
     inline auto vec_3_to_so3(const Eigen::Vector3f& vector) -> Eigen::Matrix3f {
         return Eigen::Matrix3f{
@@ -101,13 +109,18 @@ namespace Kinetics {
             };
     }
 
+
     inline auto so3_to_vec_3(const Eigen::Matrix3f& so3) -> Eigen::Vector3f {
         return Eigen::Vector3f{-so3(1, 2), so3(0, 2), -so3(0, 1)};
     }
 
+
+
     inline auto axis_angle_3(const Eigen::Vector3f & exponential_3) -> ExponentialCoordinate {
         return ExponentialCoordinate::from_vector(exponential_3);
     }
+
+
 
     inline auto matrix_exponent_3(const Eigen::Matrix3f& so3_matrix) -> Eigen::Matrix3f {
         Eigen::Vector3f exponential_3 = Kinetics::so3_to_vec_3(so3_matrix);
@@ -117,6 +130,8 @@ namespace Kinetics {
         const auto expr_2 = (1 - ::cos(theta)) * (omega_skew * omega_skew);
         return Eigen::Matrix3f::Identity() + expr_1 + expr_2;
     }
+
+
 
     inline auto rot_axis(const Eigen::Vector3f& omega , const float theta) -> Eigen::Matrix3f {
         return Kinetics::matrix_exponent_3(

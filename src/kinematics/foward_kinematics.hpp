@@ -30,6 +30,8 @@ namespace ForwardKinematics{
         Eigen::Matrix4f result = M * cache;
         return result;
     };
+
+
     inline auto forward_kinematics_in_space(const Eigen::Matrix4f& M, const std::vector<Kinetics::Vector6>& s_list, std::vector<float> theta_list) -> Eigen::Matrix4f {
         assert(s_list.size() == theta_list.size());
         std::size_t n = s_list.size();
