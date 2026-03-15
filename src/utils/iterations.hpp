@@ -114,6 +114,27 @@ namespace utils::iterations {
 
         }
 
+        inline auto test_last_elem() -> void {
+            auto powers_of_three = iterate([](int x){return x * 3;},1);
+
+            auto finite_view = std::move(powers_of_three) | std::views::take(10);
+            if (auto final_value = last(finite_view)) {
+                std::cout << "Final value of computation is " << final_value.value() << std::endl;
+            } else {
+                std::cout << "No final value was found ";
+            }
+        }
+
+        inline auto test_converged() -> void {
+            double n = 2.0;
+
+            auto result = converged(
+              iterate([n](double x){return (x + n / x) / 2.0;}, 1.0),
+              [](double a, double b) {return  std::abs(a - b) < 1e-12;}
+            );
+
+            std::cout << "Directly computed the squareroot of n with value "<< result << std::endl;
+        }
     }
 }
 
