@@ -7,6 +7,9 @@
 #include "src/kinematics/foward_kinematics.hpp"
 #include "src/kinematics/velocity_kinematics.hpp"
 #include "src/utils/iterations.hpp"
+#include "src/aether_rendering_engine/core_rendering_demo.hpp"
+
+
 class from_string {
     const char* str_;
 public:
@@ -50,5 +53,7 @@ int main() {
     utils::iterations::test_functionality::test_iterate();
     utils::iterations::test_functionality::test_last_elem();
     utils::iterations::test_functionality::test_converged();
+    dynamics::ather::viz::functionality_test::test_renderer();
+
     return 0;
 }
