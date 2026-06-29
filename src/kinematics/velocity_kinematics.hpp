@@ -115,7 +115,7 @@ namespace VelocityKinematics {
         return jacobian;
 
     }
-    inline auto jacobian_in_space(const std::vector<Kinetics::Vector6>& s_list,const std::vector<float>& theta_list) -> Eigen::MatrixXd {
+    inline auto jacobian_in_space(const std::vector<Kinetics::Vector6>& s_list,const std::vector<float>& theta_list) -> Eigen::MatrixXf {
         assert(s_list.size() - 1 == theta_list.size());
         auto matrices { VelocityKinematics::Utils::get_homogenous_matrix_list(s_list, theta_list) };
         auto zipped_pairs{Utils::generate_zipped_pair(matrices, s_list)};

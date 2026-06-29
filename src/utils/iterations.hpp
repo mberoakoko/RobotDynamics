@@ -5,6 +5,8 @@
 #ifndef ROBOTDYNAMICS_ITERATIONS_HPP
 #define ROBOTDYNAMICS_ITERATIONS_HPP
 #include <bits/stdc++.h>
+#include <concepts>  // <-- Missing header for std::convertible_to and std::invocable
+#include <generator>
 
 namespace utils::iterations {
     /**
@@ -19,15 +21,14 @@ namespace utils::iterations {
  * @return std::generator<T> A C++23 coroutine-based generator.
  */
     template<typename T , std::invocable<T> F>
-    requires std::convertible_to<std::invoke_result<F, T>, T>
+    requires std::convertible_to<std::invoke_result_t<F, T>, T>
     auto iterate(F stepping_function, T start_value) -> std::generator<T> {
         T state = std::move(start_value);
         while (true) {
             co_yield state;
             state = stepping_function(state);
         }
-    };
-
+    }
 
     /**
     * @brief Return the last value of the given range.
@@ -100,18 +101,19 @@ namespace utils::iterations {
 
     namespace test_functionality {
 
-        auto test_iterate() -> void {
+        inline auto test_iterate() -> void {
 
-            auto powers_of_two = iterate([](int x){return x**2; }, 1);
+            auto powers_of_two = iterate([](int x){return x*3; }, 1);
             std::cout << "First powers of two" << std::endl;
-            std::vector<int> values = powers_of_two
+            std::vector<int> values = std::move(powers_of_two)
                                       | std::views::take(10)
                                       | std::ranges::to<std::vector<int>>();
             std::copy(
                 std::begin(values), std::end(values),
-                std::ostream_iterator<int>(std::cout,"")
+                std::ostream_iterator<int>(std::cout," ")
                 );
 
+            std::cout << std::endl;
         }
 
         inline auto test_last_elem() -> void {
@@ -137,5 +139,4 @@ namespace utils::iterations {
         }
     }
 }
-
 #endif //ROBOTDYNAMICS_ITERATIONS_HPP

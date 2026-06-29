@@ -6,6 +6,7 @@
 
 #include "src/kinematics/foward_kinematics.hpp"
 #include "src/kinematics/velocity_kinematics.hpp"
+#include "src/utils/iterations.hpp"
 class from_string {
     const char* str_;
 public:
@@ -46,6 +47,8 @@ auto run_jacobioan_experiment() -> void {
 
 int main() {
     // run_experiments();
-    run_jacobioan_experiment();
+    utils::iterations::test_functionality::test_iterate();
+    utils::iterations::test_functionality::test_last_elem();
+    utils::iterations::test_functionality::test_converged();
     return 0;
 }
